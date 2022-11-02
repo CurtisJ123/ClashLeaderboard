@@ -3,8 +3,11 @@ import lightbulb
 from datetime import datetime
 import threading
 import extensions.Daily as Daily
+import json
 
-discordToken = ""
+cFile = open('config.json',)
+config = json.load(cFile)
+discordToken = config['discordToken']
 
 bot = lightbulb.BotApp(token=discordToken,)
 
@@ -18,7 +21,6 @@ async def bot_startup(event):
 async def print_messages(event):
     print(f"hikari.GuildMessageCreateEvent event.content = {event.content}")
 
-#Daily.checkTime()
 bot.load_extensions('extensions.Leaderboard','extensions.Clan')
 
 bot.run()

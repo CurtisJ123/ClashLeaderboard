@@ -7,10 +7,13 @@ from pymongo import MongoClient
 import threading
 import hikari
 import lightbulb
-import typing
 import time
 
-headers = {}
+cFile = open('config.json',)
+config = json.load(cFile)
+connectionString = config['connectionString']
+headers = config['headers']
+
 
 bot = None
 
@@ -25,7 +28,7 @@ async def getCurrentGuilds():
         print("botD = none")
     
 def removeGuild(guild_id):
-    client = MongoClient("")
+    client = MongoClient(connectionString)
     print("Connection Successful")
     db = client['ClashBot']
     clan_collection = db['Clan']
@@ -42,7 +45,7 @@ def removeGuild(guild_id):
     print(f'Guild removed {guild_id}')
 
 def updateGuilds(currentGuilds):
-    client = MongoClient("")
+    client = MongoClient(connectionString)
     print("Connection Successful")
     db = client['ClashBot']
     clan_collection = db['Clan']
@@ -64,7 +67,7 @@ def updateGuilds(currentGuilds):
             print(f'no guilds {clan["name"]}')
 
 def removeClan(clan_tag):
-    client = MongoClient("")
+    client = MongoClient(connectionString)
     print("Connection Successful")
     db = client['ClashBot']
     clan_collection = db['Clan']
@@ -76,7 +79,7 @@ def removeClan(clan_tag):
     member_collection.delete_many({"clan_tag": clan_tag})
 
 def findInactiveClans():
-    client = MongoClient("")
+    client = MongoClient(connectionString)
     print("Connection Successful")
     db = client['ClashBot']
     clan_collection = db['Clan']
@@ -106,7 +109,7 @@ def getClanApi(clan_tag):
     return response.json()
 
 def daily():
-    client = MongoClient("")
+    client = MongoClient(connectionString)
     print("Connection Successful")
     db = client['ClashBot']
     clan_collection = db['Clan']
@@ -133,16 +136,10 @@ def daily():
             "name": clan["name"],
             "clanLevel": clan["clanLevel"]
             }
-        # if clan_collection.find_one({"tag" : clan["tag"]}) is None:
-        #     clan_collection.insert_one(clan_dict)
-        # else:
-        #     clan_collection.replace_one({"tag" : clan["tag"]}, clan_dict)
-
 
         for member in clan["memberList"]:
             member_tag = member["tag"]
             player_api_url = f'https://api.clashofclans.com/v1/players/%23{member_tag[1:]}'
-            
             player_response = requests.get(player_api_url,headers=headers)
             player = player_response.json()
             
@@ -167,8 +164,7 @@ def daily():
                 member_collection.insert_one(member_dict)
             else:
                 member_collection.replace_one({"tag" : member["tag"],"dateTime" : member_dict["dateTime"]}, member_dict)
-                #uprint(member_dict["name"])
-        # print(str(clan_dict))
+
 
     client.close()
 def checkTime():

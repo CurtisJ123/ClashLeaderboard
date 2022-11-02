@@ -1,0 +1,8 @@
+{
+    "discordToken":"Your discord Token",
+    "connectionString":"your mongodb connectionString",
+    "headers":{
+        "Accept":"application/json",
+        "authorization":"Your clash api Auth string"
+    }
+}

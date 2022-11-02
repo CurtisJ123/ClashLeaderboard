@@ -6,8 +6,12 @@ import datetime
 import lightbulb
 import hikari
 
+cFile = open('config.json',)
+config = json.load(cFile)
+connectionString = config['connectionString']
+headers = config['headers']
 
-client = MongoClient("")
+client = MongoClient(connectionString)
 print("Connection Successful")
 db = client['ClashBot']
 clan_collection = db['Clan']
@@ -93,9 +97,7 @@ def getLeaderBoard(timeFrame, Resource, clan_tag, playerCount):
     #endregion
 
     playerCount = int(playerCount)
-    #region Headers
-    headers = {}
-    #endregion
+
     
     leaderboard_dict = {}
 
@@ -110,6 +112,7 @@ def getLeaderBoard(timeFrame, Resource, clan_tag, playerCount):
     for member in member_cursor:
         leaderboardTimeFrame = getTimeFrame(timeFrame)
         member_tag = member["tag"]
+
         player = member
         dbmember = None
         while dbmember is None:
@@ -143,7 +146,6 @@ def getLeaderBoard(timeFrame, Resource, clan_tag, playerCount):
             print(leaderboard_dict[member_tag]["Friend in Need"])
             print(leaderboard_dict[member_tag]["Sharing is caring"])
             print(leaderboard_dict[member_tag]["Siege Sharer"])
-    #leaderboard = []
 
     res = sorted(leaderboard_dict, key=lambda x: (
         leaderboard_dict[x][leaderboardResource]), reverse=True)
@@ -186,7 +188,6 @@ plugin = lightbulb.Plugin('Leaderboard')
 @lightbulb.implements(lightbulb.SlashCommand)
 async def LeaderBoard(ctx: lightbulb.SlashContext) -> None:
     rp = await ctx.respond("Please Wait ...")
-    #msg = await rp.message()
     clan_tag = getClan(ctx.guild_id)
     if clan_tag is not False:
         LeaderboardEmbed = getLeaderBoard(ctx.options.time,ctx.options.resource,clan_tag,ctx.options.players)
